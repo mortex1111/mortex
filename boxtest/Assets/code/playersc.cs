@@ -8,6 +8,7 @@ public class playersc : MonoBehaviour
     public float speed = 5f; // speed of movement
     public float jumpForce = 5f; // force of the jump
     private Rigidbody2D rb;
+    private bool isGrounded = false;
 
     void Start()
     {
@@ -24,22 +25,23 @@ public class playersc : MonoBehaviour
         rb.velocity = new Vector2(horizontalInput * speed, rb.velocity.y);
 
         // add vertical force to player when jump button is pressed and player is grounded
-        if (jumpInput && IsGrounded())
+        if (jumpInput && isGrounded == true)
         {
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         }
     }
-    private bool IsGrounded()
+   private void OnCollisionEnter2D(Collision2D collision)
     {
-        CircleCollider2D circleCollider = GetComponent<CircleCollider2D>();
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(circleCollider.bounds.center, circleCollider.radius);
-        foreach (Collider2D collider in colliders)
+        if (collision.gameObject.CompareTag("Ground"))
         {
-            if (collider.gameObject != gameObject && collider.gameObject.layer == LayerMask.NameToLayer("Ground"))
-            {
-                return true;
-            }
+            isGrounded = true;
         }
-        return false;
+    }
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = false;
+        }
     }
 }
